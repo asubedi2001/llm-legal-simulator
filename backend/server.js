@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const axios = require('axios');
-import { OpenAI } from "openai";
+const OpenAI = require('openai')
 
 const app = express();
 
