@@ -12,13 +12,14 @@ export default function Profile() {
     setMessages([...messages, userMessage]);
 
     //Needs correct location
-    const res = await fetch("",{ 
+    /*const res = await fetch("",{ 
       method: "POST",
       headers: { "Content-Type": "application/json"},
       body: JSON.stringify({messages: [...messages, userMessage]}),
-    });
-    const data = await res.json();
-    const botMessage = data.reply;
+    });*/
+    //const data = await res.json();
+    //const botMessage = data.reply;
+    const botMessage = { role: "bot", content: "TEST" };
 
     setMessages(prev => [...prev, botMessage]);
     setInput("");
