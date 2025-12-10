@@ -28,8 +28,6 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/simulation" element={<Simulation />} />
           </Routes>
-
-          <h4>Random Number: {num}</h4>
         </div>
 
         <Footer />
