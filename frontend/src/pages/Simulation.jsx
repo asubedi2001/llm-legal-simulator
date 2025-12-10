@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 
-export default function Profile() {
+export default function Profile({ doctrinesData, questionsData}) {
   
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [phase, setPhase] = useState("initial");
+  const [storySoFar, setStorySoFar] = useState("");
 
   async function sendMessage(){
     if(!input.trim()) return;
@@ -12,16 +14,26 @@ export default function Profile() {
     setMessages([...messages, userMessage]);
 
     //Needs correct location
-    /*const res = await fetch("",{ 
+    const res = await fetch("http://localhost:4444/api/generate-question",{ 
       method: "POST",
       headers: { "Content-Type": "application/json"},
-      body: JSON.stringify({messages: [...messages, userMessage]}),
-    });*/
-    //const data = await res.json();
-    //const botMessage = data.reply;
-    const botMessage = { role: "bot", content: "TEST" };
+      body: JSON.stringify({phase,
+        story_so_far: storySoFar,
+        doctrines_data: doctrinesData,
+        questions_data: questionsData,
+      }),
+    });
+    const data = await res.json();
+    const botMessageContent = data.question || "No Question Returned";
+    const storyChunk = data.storyChunk || "";
+    const botMessage = { role: "bot", content: botMessageContent };
 
     setMessages(prev => [...prev, botMessage]);
+    setStorySoFar(prev => + " " + (data.storyChunk || ""));
+
+    if (phase === "initial") setPhase("middle");
+    else if (phase === "middle") setPhase("end");
+
     setInput("");
 
   }
