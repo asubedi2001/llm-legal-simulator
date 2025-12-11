@@ -61,7 +61,7 @@ app.post("/api/evaluate", async(req, res) => {
                 { role: "system", content: o3mini_prompt },
                 {
                     role: "user",
-                    content: 'Question: ${question}\nUser Response: ${user_response}'
+                    content: `Question: ${question}\nUser Response: ${user_response}`
                 }
             ]
         });
@@ -82,26 +82,24 @@ app.post("/api/evaluate", async(req, res) => {
     }
 });
 
-app.post("/api/generate-question", async (req, res) => {
+app.post("/api/generate-question", async (req, res) => { 
     try {
         const { phase, story_so_far, doctrine_idx} = req.body;
-
+        console.log(`API CALL: phase ${phase}, !!storySoFar ${story_so_far}!!, doctrine_idx ${doctrine_idx}`)
         
-        var topic = doctrines_data[Math.floor(Math.random() * doctrines_data.length)];
-        if(doctrine_idx >= 0) {
-            topic = doctrines_data[doctrine_idx]
-        }
-
-
+        var topic = doctrines_data[doctrine_idx]
+        
         const [ex1in, ex1out] = getQuestionAndConcept(questions_data[0]);
         const [ex2in, ex2out] = getQuestionAndConcept(questions_data[1]);
         const [ex3in, ex3out] = getQuestionAndConcept(questions_data[2]);
 
-        let prompt = "";
+        let systemPrompt = "";
+        let userPrompt = "";
         if(phase === "initial") {
-            prompt = `You are a legal case question generator that creates a multi-step case based on legal concepts.
-                You will produce a multiple-choice question built around a short narrative introduction.
-                The story must introduce characters, a location, and a situation that can be expanded later.
+            systemPrompt = 
+                `You are a legal case question generator that creates a multi-step case based on legal concepts. 
+                You will produce a multiple-choice question built around a short narrative introduction. 
+                The story must introduce characters, a location, and a situation that can be expanded later. 
                 You MUST write in this structure:
 
                 1. STORY: A 3–6 sentence narrative introducing the situation.
@@ -117,13 +115,12 @@ app.post("/api/generate-question", async (req, res) => {
                 Concept: ${ex2in}
                 Question: ${ex2out}
                 Concept: ${ex3in}
-                Question: ${ex3out}
+                Question: ${ex3out}`;
 
-                Concept: ${topic.concept}. Summary Text: ${topic.intro_text}
-            `;
+            userPrompt = `Concept: ${topic.concept}. Summary Text: ${topic.intro_text}`;
         } else if (phase === "middle"){
-            prompt = `
-                You are continuing a legal case story. Your job is to write the NEXT question in the same narrative.
+            systemPrompt = 
+                `You are continuing a legal case story. Your job is to write the NEXT question in the same narrative.
                 You MUST continue the same characters, same setting, same timeline, and the same story threads.
                 Use the previous story as canon and extend it naturally.
 
@@ -141,14 +138,13 @@ app.post("/api/generate-question", async (req, res) => {
                 Concept: ${ex2in}
                 Question: ${ex2out}
                 Concept: ${ex3in}
-                Question: ${ex3out}
-
-                Story so far:
-                ${story_so_far}
-            `;
+                Question: ${ex3out}`;
+            userPrompt = 
+                `Story so far: 
+                ${story_so_far}`;
         } else if (phase === "end"){
-            prompt = `
-            Write the final question in this legal case. Continue the story from the previous section,
+            systemPrompt = 
+            `Write the final question in this legal case. Continue the story from the previous section,
             but this time bring the situation to a conclusion.
 
             Structure:
@@ -165,32 +161,59 @@ app.post("/api/generate-question", async (req, res) => {
             Concept: ${ex2in}
             Question: ${ex2out}
             Concept: ${ex3in}
-            Question: ${ex3out}
+            Question: ${ex3out}`
 
-            Story so far:
-            ${story_so_far}
-            `;
+            userPrompt = 
+                `Story so far: 
+                ${story_so_far}`;
         }
 
         const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo-0125",
             messages: [
-                {role: "system", content: "You generate legal case questions."},
-                {role: "user", content: prompt}
+                {role: "system", content: systemPrompt},
+                {role: "user", content: userPrompt}
             ],
             temperature: .7,
-            max_tokens: 500
+            max_tokens: 500,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            stop: ["###"]
         });
 
-        const text = response.choices[0].message.content;
+        console.log(response.choices[0].message.content)
+        const text = response.choices[0].message.content.trim();
 
-        const storyChunk = text.split("/")[0]?.trim();
-        const questionPart = text.split("/")[1]?.trim();
+
+        {/* experiencing parsing issues due to llm sometimes dropping our delimiter + variable casing */}
+        const withSlash = /\/\s*answer\s*:/i;
+        const noSlash = /answer\s*:/i;
+
+        let storyChunk = '';
+        let answerChunk = '';
+
+        if (withSlash.test(text)) {
+            const split = text.search(withSlash);
+            storyChunk = text.substring(0, split)?.trim()
+            answerChunk = text.substring(split)?.trim()
+        } else if (noSlash.test(text)) {
+            const split = text.search(noSlash);
+            storyChunk = text.substring(0, split)?.trim()
+            answerChunk = text.substring(split)?.trim()
+        } else  {
+            // in case I cant find any delimiter
+            storyChunk = text.trim();
+            answerChunk = "No provided Answer/Rationale"
+        }
+        
+        console.log(`-------START STORY-------\n${storyChunk}`)
+        console.log(`-------START ANSWER-------\n${answerChunk}`)
 
         res.json({
             full: text,
             storyChunk,
-            question: questionPart
+            answerChunk
         });
     } catch (err) {
         console.error(err);
