@@ -2,6 +2,10 @@
 
 An interactive legal learning simulation built using a GPT model fine tuned on the LegalStories dataset. Users progress through llm generated legal scenarios and answer doctrine-based questions. Correct answers will progress the user through the scenario, and incorrect answers provide explanations. A fine-tuned GPT-3.5 model provides story generation, doctrine based questioning, and informative feedback.
 
+As of now, the Front-End does not fully work with the LLM and it would be recommended for testing and grading purposes to run the Google Collab, which is at the bottom of the read-me.
+
+If you have any concerns or questions please reach out to any of us on the team and we can respond asap.
+
 ## Installation
 
 Requirement: Node.js, npm (bundled with Node)
