@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const CASE_CONCEPTS = [
+export const CASE_CONCEPTS = [
       {
         idx: 0,
         concept_name: 'Abstention doctrine'        
