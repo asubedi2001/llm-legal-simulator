@@ -1,13 +1,23 @@
 import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
-export default function Profile({ doctrinesData, questionsData}) {
+export default function Simulation() {
   
+  const [searchParams] = useSearchParams();
+  const indexString = searchParams.get('index');
+  const doctrine_idx = indexString ? parseInt(indexString, 10) : -1;
+  if (doctrine_idx < 0) {
+    console.log("Using random doctrine")
+  }
+
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [phase, setPhase] = useState("initial");
   const [storySoFar, setStorySoFar] = useState("");
 
   async function sendMessage(){
+    console.log(input)
+
     if(!input.trim()) return;
 
     const userMessage = {role: "user", content: input};
@@ -17,10 +27,10 @@ export default function Profile({ doctrinesData, questionsData}) {
     const res = await fetch("http://localhost:4444/api/generate-question",{ 
       method: "POST",
       headers: { "Content-Type": "application/json"},
-      body: JSON.stringify({phase,
+      body: JSON.stringify({
+        phase,
         story_so_far: storySoFar,
-        doctrines_data: doctrinesData,
-        questions_data: questionsData,
+        doctrine_idx: doctrine_idx,
       }),
     });
     const data = await res.json();
@@ -53,7 +63,7 @@ export default function Profile({ doctrinesData, questionsData}) {
       value = {input}
       onChange = {e => setInput(e.target.value)}
       style = {{ width: "80%", padding: 8, border: "2px solid #000000ff", borderRadius: 4 }}/>
-      <button class="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer" onClick = {sendMessage} style = {{ padding: 8 }}>Send</button>
+      <button className="bg-blue-800 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition cursor-pointer" onClick = {sendMessage} style = {{ padding: 8 }}>Send</button>
     </div>
 
     

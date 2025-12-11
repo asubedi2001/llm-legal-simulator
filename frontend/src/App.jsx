@@ -9,14 +9,6 @@ import Profile from "./pages/Profile";
 import Simulation from "./pages/Simulation"
 
 function App() {
-  const [num, setNum] = useState("")
-
-  useEffect(() => {
-    fetch("http://localhost:4444/api_example/randomnum")
-      .then(res => res.json())
-      .then(data => setNum(data.randNum));
-  }, []);
-
   return (
       <div className="flex flex-col min-h-screen w-full">
         <Navbar />

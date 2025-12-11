@@ -10,7 +10,6 @@ export default function Header() {
       <div className="flex space-x-4">
         <Link to="/"><Button>Home</Button></Link>
         <Link to="/cases"><Button>Cases</Button></Link>
-        <Link to="/profile"><Button>Profile</Button></Link>
       </div>
     </header>
   );

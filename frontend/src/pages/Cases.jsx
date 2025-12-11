@@ -1,4 +1,7 @@
-const CASES = [
+import React, {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const CASE_CONCEPTS = [
       {
         idx: 0,
         concept_name: 'Abstention doctrine'        
@@ -406,13 +409,66 @@ const CASES = [
 ]
 
 
-const Cases = () => {
-  return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">Cases</h2>
-      <p>This is the cases page. Create tiles that act as buttons for legal doctrines here.</p>
-    </div>
-  );
-}
+export default function Cases() {
+  const navigate = useNavigate();
 
-export default Cases;
+  const [searchQuery, setQuery] = useState('');
+  const [filteredCases, setFilteredCases] = useState(CASE_CONCEPTS);
+  
+  const filterCases = (query) => {
+    const processedQuery = query.toLowerCase();
+    const results = CASE_CONCEPTS.filter(concept =>
+      concept.concept_name.toLowerCase().includes(processedQuery)
+    );
+    setFilteredCases(results);
+  };
+
+  const handleQueryChange = (event) => {
+    const value = event.target.value;
+    setQuery(value);
+    filterCases(value);
+  };
+
+  const handleCaseSelect = (doctrine_idx) => {
+    navigate(`/Simulation?index=${doctrine_idx}`)
+  }
+
+  return (
+        <div className="cases-page p-6">
+            <h1 className="text-3xl font-bold mb-6">🏛️ Legal Case Concepts</h1>
+
+            <div className="flex mb-8 space-x-3">
+                <input
+                    type="text"
+                    placeholder="Search case concepts..."
+                    value={searchQuery}
+                    onChange={handleQueryChange}
+                    className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            </div>
+
+            <hr className="mb-8" />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredCases.length > 0 ? (
+                    filteredCases.map((concept) => (
+                        <div 
+                            key={concept.idx} 
+                            className="p-4 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition duration-150 cursor-pointer"
+                        >
+                            <button 
+                              onClick={() => handleCaseSelect(concept.idx)}
+                            >
+                              <p className="font-medium text-lg text-gray-800">
+                                  {concept.concept_name}
+                              </p>
+                            </button>
+                        </div>
+                    ))
+                ) : (
+                    <p className="text-gray-500 col-span-full">No concepts found for the query: "{searchQuery}".</p>
+                )}
+            </div>
+        </div>
+    );
+}

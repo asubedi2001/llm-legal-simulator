@@ -13,11 +13,14 @@ git clone https://github.com/asubedi2001/llm-legal-simulator.git
 cd llm-legal-simulator
 ```
 
-### Install Dependencies
+### Install Dependencies and Necessary File
 
 ```
 cd backend
 npm install
+wget https://raw.githubusercontent.com/hjian42/LegalStories/main/data/101-doctrines/legal_doctrines_101.tsv
+wget https://raw.githubusercontent.com/hjian42/LegalStories/main/data/101-doctrines/gpt3.5_story_question_101.tsv
+
 cd ../frontend
 npm install
 ```

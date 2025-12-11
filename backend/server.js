@@ -3,36 +3,38 @@ const express = require("express");
 const cors = require("cors");
 const axios = require('axios');
 const OpenAI = require('openai')
+const fs = require('fs');
+const { tsvParse } = require('d3-dsv');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const client = new OpenAI({
+const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 })
 
 const MODEL_ID = 'ftjob-IfBfUgHYscCplmUgnyiODGfU'
 
-function getQuestionAndConcept(question) {
-    const promptPart = 'Concept: ${question.concept}. Summary Text: ${question.intro_text}';
+const questions_data = readTSV('./gpt3.5_story_question_101.tsv');
+const doctrines_data = readTSV('./legal_doctrines_101.tsv')
 
-    let completion = 'Story: ${question.story} Question: ${question.ending_question}';
+function readTSV(filePath) {
+    const fileContent = fs.readFileSync(filePath, 'utf8');
+    const data = tsvParse(fileContent);
+    return data;
+}
+
+function getQuestionAndConcept(question) {
+    const promptPart = `Concept: ${question.concept}. Summary Text: ${question.intro_text}`;
+
+    let completion = `Story: ${question.story} Question: ${question.ending_question}`;
 
     completion = completion.replace(/\n\n/g, "\n");
 
     return [promptPart, completion];
 }
-
-// rest api example for backend team
-app.get("/api_example/randomnum", (req, res) => {
-    //  obtain value as per request (use axios for external call later)
-    const randNum = Math.floor(Math.random() * 100);
-
-    // respond with value
-    res.json({ randNum: randNum })
-});
 
 const o3mini_prompt = `
 You are a legal evaluator. Given a question, the correct response, 
@@ -53,7 +55,7 @@ app.post("/api/evaluate", async(req, res) => {
     try {
         const { question, user_response } = req.body;
 
-        const response = await client.chat.completions.create({
+        const response = await openai.chat.completions.create({
             model: "o3-mini",
             message: [
                 { role: "system", content: o3mini_prompt },
@@ -82,9 +84,14 @@ app.post("/api/evaluate", async(req, res) => {
 
 app.post("/api/generate-question", async (req, res) => {
     try {
-        const { phase, story_so_far, doctrines_data, questions_data } = req.body;
+        const { phase, story_so_far, doctrine_idx} = req.body;
 
-        const topic = doctrines_data[Math.floor(Math.random() * doctrines_data.length)];
+        
+        var topic = doctrines_data[Math.floor(Math.random() * doctrines_data.length)];
+        if(doctrine_idx >= 0) {
+            topic = doctrines_data[doctrine_idx]
+        }
+
 
         const [ex1in, ex1out] = getQuestionAndConcept(questions_data[0]);
         const [ex2in, ex2out] = getQuestionAndConcept(questions_data[1]);
@@ -165,14 +172,14 @@ app.post("/api/generate-question", async (req, res) => {
             `;
         }
 
-        const response = await client.chat.completions.create({
+        const response = await openai.chat.completions.create({
             model: "gpt-3.5-turbo-0125",
-            message: [
+            messages: [
                 {role: "system", content: "You generate legal case questions."},
                 {role: "user", content: prompt}
             ],
             temperature: .7,
-            max_token: 500
+            max_tokens: 500
         });
 
         const text = response.choices[0].message.content;
