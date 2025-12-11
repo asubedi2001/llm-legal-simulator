@@ -45,3 +45,13 @@ Once inside project directory, issue these commands:
 cd frontend
 npm run dev
 ```
+
+
+### GOOGLE COLLAB FILE
+
+If you want to instead run the demo, the Google Collab, please open the file below and then run every block of code.
+Make sure to run "Play Demo" section.
+
+```
+LegalSim.ipynb
+```
