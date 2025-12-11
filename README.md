@@ -17,6 +17,19 @@ git clone https://github.com/asubedi2001/llm-legal-simulator.git
 cd llm-legal-simulator
 ```
 
+### Google Collab (RECOMMENDED TO USE)
+
+If you want to instead run the demo, the Google Collab, please open the file below and then run every block of code.
+Make sure to run "Play Demo" section.
+
+```
+LegalSim.ipynb
+```
+
+### Front-End (Not fully functioning)
+
+Just due to time limitations and conversion from the collab to JS the front end does not fully work and would recommend if you want to test please use the google collab for testing.
+
 ### Install Dependencies and Necessary File
 
 ```
@@ -50,12 +63,3 @@ cd frontend
 npm run dev
 ```
 
-
-### GOOGLE COLLAB FILE
-
-If you want to instead run the demo, the Google Collab, please open the file below and then run every block of code.
-Make sure to run "Play Demo" section.
-
-```
-LegalSim.ipynb
-```
