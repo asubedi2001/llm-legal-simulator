@@ -1,10 +1,19 @@
 # LLM Legal Simulator
 
-An interactive legal learning simulation built using a GPT model fine tuned on the LegalStories dataset. Users progress through llm generated legal scenarios and answer doctrine-based questions. Correct answers will progress the user through the scenario, and incorrect answers provide explanations. A fine-tuned GPT-3.5 model provides story generation, doctrine based questioning, and informative feedback.
+An interactive legal learning simulation built using a GPT model fine tuned on the LegalStories dataset. Users progress through llm generated legal scenarios and answer doctrine-based questions. Correct answers will progress the user through the scenario, and incorrect answers provide explanations. A fine-tuned GPT-3.5 model provides story generation, doctrine based questioning, and the GPTo3-mini model provides informative feedback for responses.
 
-As of now, the Front-End does not fully work with the LLM and it would be recommended for testing and grading purposes to run the Google Collab, which is at the bottom of the read-me.
+As of now, the Front-End does not fully work with the LLM and it would be recommended for testing and grading purposes to run the Jupyter Notebook file in Google Colab, which is shown below.
 
 If you have any concerns or questions please reach out to any of us on the team and we can respond asap.
+
+### Jupyter Notebook Demo: Google Colab (RECOMMENDED TO USE)
+
+If you want to instead run the demo, please open the file below, and then run every block of code. 
+The simulation can be played by running the cell below the "Play the Demo" section at the very bottom of the notebook.
+
+```
+LegalSim.ipynb
+```
 
 ## Installation
 
@@ -15,15 +24,6 @@ Requirement: Node.js, npm (bundled with Node)
 ```
 git clone https://github.com/asubedi2001/llm-legal-simulator.git
 cd llm-legal-simulator
-```
-
-### Google Collab (RECOMMENDED TO USE)
-
-If you want to instead run the demo, the Google Collab, please open the file below and then run every block of code.
-Make sure to run "Play Demo" section.
-
-```
-LegalSim.ipynb
 ```
 
 ### Front-End (Not fully functioning)
